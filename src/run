@@ -1,0 +1,22 @@
+
+# module load intel
+# module load impi 
+ 
+
+rm *.plt
+
+mpirun --oversubscribe -n 4 ./fd -nPEx 2 -nPEy 2 -nCellx 10 -nCelly 10   > tmp
+#mpirun -n 4 ./fd -nPEx 2 -nPEy 2 -nCellx  3 -nCelly  3   > tmp
+#mpirun -n 1 ./fd -nPEx 1 -nPEy 1 -nCellx  20 -nCelly  20   > tmp
+#mpirun -n 2 ./fd -nPEx 2 -nPEy 1 -nCellx  1 -nCelly  1   > tmp
+
+grep -v "myPE:"   tmp > tmpall
+grep    "myPE: 0" tmp > tmp0
+grep    "myPE: 1" tmp > tmp1
+grep    "myPE: 2" tmp > tmp2
+grep    "myPE: 3" tmp > tmp3 
+
+
+
+cat tmpall
+

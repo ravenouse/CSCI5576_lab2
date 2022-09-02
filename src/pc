@@ -1,0 +1,4 @@
+#set term png
+#set output "plot.png"
+splot 'F_phi_0.plt' w l , 'F_phi_1.plt' w l , 'F_phi_2.plt' w l , 'F_phi_3.plt' w l
+
