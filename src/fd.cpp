@@ -106,13 +106,13 @@ public:
   //  ||
   //  ==
 
-  LaplacianOnGrid(double _x0   , double _x1,  double _y0, double _y1 , int ncell_x , int ncell_y, mpiInfo &myMPI )
+  LaplacianOnGrid(double _x0 , double _x1,  double _y0, double _y1 , int ncell_x , int ncell_y, mpiInfo &myMPI )
   {
 
     x0 = _x0;    x1 = _x1;
     y0 = _y0;    y1 = _y1;
     
-    nRealx     = ncell_x + 1; 
+    nRealx     = ncell_x + 1; //?1: what does thise nrealx and nrealy mean? why plus 1 here?
     nRealy     = ncell_y + 1; 
     nField  = (nRealx+2)*(nRealy+2);  
     dx     = (x1-x0)/ncell_x;
@@ -122,7 +122,7 @@ public:
     // match.  So even though we only will be caring about real nodes, their node
     // numbers are naturally ordered, so must be of size nField.
 
-    x.resize(nField+1); y.resize(nField+1);
+    x.resize(nField+1); y.resize(nField+1); //?3: why nField+1?
 		       
     for ( int i = 1 ; i <= nRealx ; ++i )
       for ( int j = 1 ; j <= nRealy ; ++j )
@@ -132,8 +132,9 @@ public:
 	  y[p] = y0 + (j-1)*dy;
 	}
 
-    A.resize(nField+1 ); rLOOP A[r].resize(nField+1);
-    b.resize(nField+1 );
+    // ?2: what is the purpose of this? why plus 1 here?
+    A.resize(nField+1 ); rLOOP A[r].resize(nField+1); 
+    b.resize(nField+1 ); 
     phi.resize(nField+1);
 
     myPE = myMPI.myPE;

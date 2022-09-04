@@ -1,0 +1,50 @@
+
+---------------------------------------------
+
+ F I N I T E   D I F F E R E N C E         
+ D E M O   C O D E                           
+
+ Running on 4 processors 
+
+---------------------------------------------
+myPE: 1 x0 = myPE: 2 x0 = myPE: 3 x0 = 
+
+Input Summary: 
+--------------------------- 
+No. PE   in  x-direction: 2
+             y-direction: 2
+1
+0
+myPE: 2No. Cells in x-direction: 5
+             y-direction: 5
+
+myPE: 0 x0 = myPE: 1 x1 = 2
+myPE: 1 y0 = 0
+myPE: 1 y1 = 1 x1 = 1
+myPE: 2 y0 = 1
+myPE: 2 y1 = 2
+1
+myPE: 3 x1 = 2
+myPE: 3 y0 = 1
+myPE: 3 y1 = 2
+0
+myPE: 0 x1 = 1
+myPE: 0
+ y0 = 0
+myPE: 0 y1 = 1
+                                          
+Form Linear System:                       
+------------------------------------------
+                                          
+                                          
+Solve Linear System:
+------------------------------------------
+                                          
+Jacobi: max_iter of 500 reached.
+                                          
+Plot Results:
+------------------------------------------
+                                          
+Jacobi: max_iter of 500 reached.
+Jacobi: max_iter of 500 reached.
+Jacobi: max_iter of 500 reached.

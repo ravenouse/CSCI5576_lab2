@@ -102,15 +102,15 @@ class mpiInfo
       }
     if ( jPE > 0      )
       {
-	// TO-DO
+	nei_s = myPE - nPEx;
       }
     if ( iPE < nPEx-1 )
       {
-	// TO-DO
+	nei_e = myPE + 1    ;
       }
     if ( jPE < nPEy-1 )
       {
-	// TO-DO
+	nei_n = myPE + nPEx;
       }
 
     countx = nRealx + 2;
@@ -134,8 +134,10 @@ class mpiInfo
   }
 
   void ExchangeBoundaryInfo(VD &Solution, VD &b)
+  // send information to the adjacent processes during each iteration of the jocobi solver
+  // Then, in the jacobi solver, we will re-apply BCs using a call to "ApplyBCs"
   {
-	sLOOP phiSend_n[s] = 0.;
+	sLOOP phiSend_n[s] = 0.; // size of phiSend_n is countx, which is nRealx + 2. 12 for this run
 	sLOOP phiSend_s[s] = 0.;
 	tLOOP phiSend_e[t] = 0.;
 	tLOOP phiSend_w[t] = 0.;
@@ -146,46 +148,50 @@ class mpiInfo
 
 	// (1.1) Record values on PE physical boundaries.  These align with the adjacent PE's GHOST NODES, not physical nodes.
 	
-	tLOOP phiL[t] = Solution[ pid(    2 ,    t ) ];      
-	tLOOP phiR[t] = Solution[ pid( nRealx-1 ,    t ) ];
-	sLOOP phiT[s] = Solution[ /* TO-DO in LAB */ ];
-	sLOOP phiB[s] = Solution[ /* TO-DO in LAB */ ];
+	tLOOP phiL[t] = Solution[ pid(    2     ,    t     ) ];      
+	tLOOP phiR[t] = Solution[ pid( nRealx-1 ,    t     ) ];
+	sLOOP phiT[s] = Solution[ pid(    s     , nRealy-1 ) ];
+	sLOOP phiB[s] = Solution[ pid(    s     ,     2    ) ];
 	
 	// (1.2) Put them into communication arrays
 	
 	sLOOP phiSend_n[s] = phiT[s];
 	sLOOP phiSend_s[s] = phiB[s];
-	tLOOP phiSend_e[t] = /* TO-Do in LAB */;
-	tLOOP phiSend_w[t] = /* TO-Do in LAB */;
+	tLOOP phiSend_e[t] = phiR[t];
+	tLOOP phiSend_w[t] = phiL[t];
 
 	// (1.3) Send them to neighboring PEs
 
-	if ( nei_n >= 0 )  err = MPI_Isend(  /* TO-DO in LAB */  );
-	if ( nei_s >= 0 )  err = MPI_Isend(  /* TO-DO in LAB */  );
-	if ( nei_e >= 0 )  err = MPI_Isend(  /* TO-DO in LAB */  );
-	if ( nei_w >= 0 )  err = MPI_Isend(  /* TO-DO in LAB */  );
+	if ( nei_n >= 0 )  err = MPI_Isend(phiSend_n, countx, MPI_DOUBLE, nei_n, tag, MPI_COMM_WORLD, &request);
+	if ( nei_s >= 0 )  err = MPI_Isend(phiSend_s, countx, MPI_DOUBLE, nei_s, tag, MPI_COMM_WORLD, &request);
+	if ( nei_e >= 0 )  err = MPI_Isend(phiSend_e, county, MPI_DOUBLE, nei_e, tag, MPI_COMM_WORLD, &request);
+	if ( nei_w >= 0 )  err = MPI_Isend(phiSend_w, county, MPI_DOUBLE, nei_w, tag, MPI_COMM_WORLD, &request);
 
 	// (1.4) Receive values from neighobring PEs' physical boundaries.
 	
-	if ( nei_n >= 0 ) { err = MPI_Irecv(  /* TO-DO in LAB */   );   MPI_Wait(&request,&status); }   
-	if ( nei_s >= 0 ) { err = MPI_Irecv(  /* TO-DO in LAB */   );   MPI_Wait(&request,&status); }
-	if ( nei_e >= 0 ) { err = MPI_Irecv(  /* TO-DO in LAB */   );   MPI_Wait(&request,&status); }
-	if ( nei_w >= 0 ) { err = MPI_Irecv(  /* TO-DO in LAB */   );   MPI_Wait(&request,&status); }
+	if ( nei_n >= 0 ) { err = MPI_Irecv(phiRecv_n, countx, MPI_DOUBLE, nei_n, tag, MPI_COMM_WORLD, &request);   MPI_Wait(&request,&status); }   
+	if ( nei_s >= 0 ) { err = MPI_Irecv(phiRecv_s, countx, MPI_DOUBLE, nei_s, tag, MPI_COMM_WORLD, &request);   MPI_Wait(&request,&status); }
+	if ( nei_e >= 0 ) { err = MPI_Irecv(phiRecv_e, county, MPI_DOUBLE, nei_e, tag, MPI_COMM_WORLD, &request);   MPI_Wait(&request,&status); }
+	if ( nei_w >= 0 ) { err = MPI_Irecv(phiRecv_w, county, MPI_DOUBLE, nei_w, tag, MPI_COMM_WORLD, &request);   MPI_Wait(&request,&status); }
 	
 	// (1.5) If new information was received, store it in the candy-coating values
 
-	if ( nei_n >= 0 ) sLOOP { phiT[s] = /* TO-DO in LAB */; } 
-	if ( nei_s >= 0 ) /* TO-DO in LAB */
-	if ( nei_e >= 0 ) /* TO-DO in LAB */
-	if ( nei_w >= 0 ) /* TO-DO in LAB */
+	if ( nei_n >= 0 ) sLOOP { phiT[s] = phiRecv_n[s]; } 
+	if ( nei_s >= 0 ) sLOOP { phiB[s] = phiRecv_s[s]; } 
+	if ( nei_e >= 0 ) tLOOP { phiR[t] = phiRecv_e[t]; } 
+	if ( nei_w >= 0 ) tLOOP { phiL[t] = phiRecv_w[t]; } 
 	
-        if ( nei_n >= 0 ) sLOOP Solution[ pid( s        , nRealy+1) ] = /* TO-DO in LAB */; 
-	/* TO-DO in LAB (other three sides: e,w,s) */
+        if ( nei_n >= 0 ) sLOOP Solution[ pid( s        , nRealy+1) ] = phiT[s]; 
+        if ( nei_s >= 0 ) sLOOP Solution[ pid( s        ,     1   ) ] = phiB[s];
+        if ( nei_e >= 0 ) tLOOP Solution[ pid( nRealx+1, t        ) ] = phiR[t];
+        if ( nei_w >= 0 ) tLOOP Solution[ pid(     1   , t        ) ] = phiL[t];
 	
 	// (1.2) Apply exchanged information as BCs
 	
-        if ( nei_n >= 0 ) sLOOP b[ pid ( s        , nRealy+1 ) ] = /* TO-DO in LAB */ ;
-	/* TO-DO in LAB (other three sides: e,w,s) */
+        if ( nei_n >= 0 ) sLOOP b[ pid ( s        , nRealy+1 ) ] = phiT[s];
+        if ( nei_s >= 0 ) sLOOP b[ pid ( s        ,     1    ) ] = phiB[s];
+        if ( nei_e >= 0 ) tLOOP b[ pid ( nRealx+1 , t        ) ] = phiR[t];
+        if ( nei_w >= 0 ) tLOOP b[ pid (     1    , t        ) ] = phiL[t];
   }
   
   int pid(int i,int j) { return (i+1) + (j)*(nRealx+2); }  
