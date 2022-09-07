@@ -114,7 +114,7 @@ void GS_or_Jacobi(int max_iter , VD RHS, VD &Solution , mpiInfo &myMPI , int GSo
 	// ----------------------------------------------
 
 	int root = 0;
-	err = MPI_Reduce( &converged       , &global_converged, one , MPI_INT , MPI_MIN , zero , MPI_COMM_WORLD );
+	err = MPI_Reduce( &converged , &global_converged, one , MPI_INT , MPI_MIN , zero , MPI_COMM_WORLD );
 	err = MPI_Bcast ( &global_converged,                    one , MPI_INT,            zero , MPI_COMM_WORLD );
 	converged = global_converged;
 

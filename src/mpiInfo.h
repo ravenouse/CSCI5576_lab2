@@ -182,16 +182,16 @@ class mpiInfo
 	if ( nei_w >= 0 ) tLOOP { phiL[t] = phiRecv_w[t]; } 
 	
         if ( nei_n >= 0 ) sLOOP Solution[ pid( s        , nRealy+1) ] = phiT[s]; 
-        if ( nei_s >= 0 ) sLOOP Solution[ pid( s        ,     1   ) ] = phiB[s];
+        if ( nei_s >= 0 ) sLOOP Solution[ pid( s        ,     0   ) ] = phiB[s]; // 1 needs to be 0. since these are the ghost nodes
         if ( nei_e >= 0 ) tLOOP Solution[ pid( nRealx+1, t        ) ] = phiR[t];
-        if ( nei_w >= 0 ) tLOOP Solution[ pid(     1   , t        ) ] = phiL[t];
+        if ( nei_w >= 0 ) tLOOP Solution[ pid(     0   , t        ) ] = phiL[t];
 	
 	// (1.2) Apply exchanged information as BCs
 	
         if ( nei_n >= 0 ) sLOOP b[ pid ( s        , nRealy+1 ) ] = phiT[s];
-        if ( nei_s >= 0 ) sLOOP b[ pid ( s        ,     1    ) ] = phiB[s];
+        if ( nei_s >= 0 ) sLOOP b[ pid ( s        ,     0    ) ] = phiB[s];
         if ( nei_e >= 0 ) tLOOP b[ pid ( nRealx+1 , t        ) ] = phiR[t];
-        if ( nei_w >= 0 ) tLOOP b[ pid (     1    , t        ) ] = phiL[t];
+        if ( nei_w >= 0 ) tLOOP b[ pid (     0    , t        ) ] = phiL[t];
   }
   
   int pid(int i,int j) { return (i+1) + (j)*(nRealx+2); }  
